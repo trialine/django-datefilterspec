@@ -11,8 +11,7 @@ import django
 from django import forms
 from django.contrib import admin
 from django.db import models
-from django.utils.translation import ugettext as _
-from django.contrib.admin.templatetags.admin_static import static
+from django.utils.translation import gettext as _
 from django.conf import settings
 
 use_suit = 'DATE_RANGE_FILTER_USE_WIDGET_SUIT'
@@ -34,12 +33,6 @@ try:
     from django.utils.html import format_html
 except ImportError:
     from django.utils.html import conditional_escape, mark_safe
-
-    def format_html(format_string, *args, **kwargs):
-        args_safe = map(conditional_escape, args)
-        kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in kwargs.items())
-        return mark_safe(format_string.format(*args_safe, **kwargs_safe))
-
 
 # Django doesn't deal well with filter params that look like queryset lookups.
 FILTER_PREFIX = 'drf__'
@@ -74,8 +67,8 @@ class DateRangeFilterBaseForm(forms.Form):
             css = ['widgets.css']
 
             return forms.Media(
-                js=[static("admin/js/%s" % path) for path in js],
-                css={'all': [static("admin/css/%s" % path) for path in css]}
+                js=["admin/js/%s" % path for path in js],
+                css={'all': ["admin/css/%s" % path for path in css]}
             )
 
 
