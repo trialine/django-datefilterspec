@@ -134,7 +134,13 @@ class DateTimeRangeForm(DateRangeFilterBaseForm):
             return super(DateTimeRangeForm, self).media
 
 
-class DateRangeFilter(admin.filters.FieldListFilter):
+class UsedParametersMixin:
+    def __init__(self, *args, **kwargs):
+        super(UsedParametersMixin, self).__init__(*args, **kwargs)
+        self.used_parameters = {k: v[0] if isinstance(v, list) else v for k, v in self.used_parameters.items()}
+
+
+class DateRangeFilter(UsedParametersMixin, admin.filters.FieldListFilter):
     template = 'daterange_filter/filter.html'
 
     def __init__(self, field, request, params, model, model_admin, field_path):
@@ -178,7 +184,7 @@ class DateRangeFilter(admin.filters.FieldListFilter):
             return queryset
 
 
-class DateTimeRangeFilter(admin.filters.FieldListFilter):
+class DateTimeRangeFilter(UsedParametersMixin, admin.filters.FieldListFilter):
     template = 'daterange_filter/filter.html'
 
     def __init__(self, field, request, params, model, model_admin, field_path):
@@ -187,8 +193,7 @@ class DateTimeRangeFilter(admin.filters.FieldListFilter):
         self.lookup_kwarg_upto_0 = '%s%s__lte_0' % (FILTER_PREFIX, field_path)
         self.lookup_kwarg_upto_1 = '%s%s__lte_1' % (FILTER_PREFIX, field_path)
 
-        super(DateTimeRangeFilter, self).__init__(
-            field, request, params, model, model_admin, field_path)
+        super(DateTimeRangeFilter, self).__init__(field, request, params, model, model_admin, field_path)
         self.form = self.get_form(request)
 
     def choices(self, cl):
